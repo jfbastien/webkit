@@ -34,6 +34,11 @@ const _isUndef = (v) => {
 };
 
 const _eq = (lhs, rhs) => {
+    if (Array.isArray(lhs) && Array.isArray(rhs) && (lhs.length === rhs.length)) {
+        for (let i = 0; i !== lhs.length; ++i)
+            _eq(lhs[i], rhs[i]);
+        return;
+    }
     if (lhs !== rhs)
         throw new Error(`Not the same: "${lhs}" and "${rhs}"`);
 };
