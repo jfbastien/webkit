@@ -355,6 +355,7 @@ export default class Builder {
                     return typeBuilder;
                 };
                 break;
+
             case "Import":
                 this[section] = function() {
                     const s = this._addSection(section);
@@ -367,6 +368,41 @@ export default class Builder {
                     importBuilder.Function = _importFunctionContinuation(this, s, importBuilder);
                     return importBuilder;
                 };
+                break;
+
+            case "Function":
+                this[section] = function() {
+                    const s = this._addSection(section);
+                    const exportBuilder = {
+                        End: () => this
+                        // FIXME: add ability to add this with whatever.
+                    };
+                    return exportBuilder;
+                };
+                break;
+
+            case "Table":
+                // FIXME
+                this[section] = () => { throw new Error(`Unimplemented: section type "${section}"`); };
+                break;
+
+            case "Memory":
+                this[section] = function() {
+                    const s = this._addSection(section);
+                    const exportBuilder = {
+                        End: () => this,
+                        InitialMaxPages: (initial, max) => {
+                            s.data.push({ initial, max });
+                            return exportBuilder;
+                        }
+                    };
+                    return exportBuilder;
+                };
+                break;
+
+            case "Global":
+                // FIXME
+                this[section] = () => { throw new Error(`Unimplemented: section type "${section}"`); };
                 break;
 
             case "Export":
@@ -383,29 +419,14 @@ export default class Builder {
                 };
                 break;
 
-            case "Memory":
-                this[section] = function() {
-                    const s = this._addSection(section);
-                    const exportBuilder = {
-                        End: () => this,
-                        InitialMaxPages: (initial, max) => {
-                            s.data.push({ initial, max });
-                            return exportBuilder;
-                        }
-                    };
-                    return exportBuilder;
-                }
+            case "Start":
+                // FIXME
+                this[section] = () => { throw new Error(`Unimplemented: section type "${section}"`); };
                 break;
 
-            case "Function":
-                this[section] = function() {
-                    const s = this._addSection(section);
-                    const exportBuilder = {
-                        End: () => this
-                        // FIXME: add ability to add this with whatever.
-                    }
-                    return exportBuilder;
-                }
+            case "Element":
+                // FIXME
+                this[section] = () => { throw new Error(`Unimplemented: section type "${section}"`); };
                 break;
 
             case "Code":
@@ -453,11 +474,17 @@ export default class Builder {
                 };
                 break;
 
-            default:
+            case "Data":
+                // FIXME
                 this[section] = () => { throw new Error(`Unimplemented: section type "${section}"`); };
+                break;
+
+            default:
+                this[section] = () => { throw new Error(`Unknown section type "${section}"`); };
                 break;
             }
         }
+
         this.Unknown = function(name) {
             const s = this._addSection(name);
             const builder = this;

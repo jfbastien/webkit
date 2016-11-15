@@ -28,6 +28,7 @@
 
 #if ENABLE(WEBASSEMBLY)
 
+#include "IdentifierInlines.h"
 #include "WasmFormat.h"
 #include "WasmMemory.h"
 #include "WasmOps.h"
@@ -123,7 +124,8 @@ bool ModuleParser::parse()
                 m_errorMessage = "couldn't parse section " #NAME ": " DESCRIPTION; \
                 return false; \
             } \
-        } break;
+        } \
+        break;
         FOR_EACH_WASM_SECTION(WASM_SECTION_PARSE)
 #undef WASM_SECTION_PARSE
 
@@ -167,7 +169,7 @@ bool ModuleParser::parseType()
         int8_t type;
         if (!parseInt7(type))
             return false;
-        if (type != -0x20) // Function type constant.
+        if (type != -0x20) // Function type constant. FIXME auto-generate from JSON file.
             return false;
 
         if (verbose)
@@ -226,12 +228,16 @@ bool ModuleParser::parseImport()
         uint32_t fieldLen;
         if (!parseVarUInt32(moduleLen))
             return false;
-        if (!consumeUTF8String(i.module, moduleLen))
+        String moduleString;
+        if (!consumeUTF8String(moduleString, moduleLen))
             return false;
+        i.module = Identifier::fromString(m_vm, moduleString);
         if (!parseVarUInt32(fieldLen))
             return false;
-        if (!consumeUTF8String(i.field, fieldLen))
+        String fieldString;
+        if (!consumeUTF8String(fieldString, fieldLen))
             return false;
+        i.field = Identifier::fromString(m_vm, fieldString);
         if (!parseExternalKind(i.kind))
             return false;
         switch (i.kind) {
@@ -239,10 +245,11 @@ bool ModuleParser::parseImport()
             uint32_t functionSignatureIndex;
             if (!parseVarUInt32(functionSignatureIndex))
                 return false;
-            if (functionSignatureIndex > m_module->signatures.size())
+            if (functionSignatureIndex >= m_module->signatures.size())
                 return false;
             i.functionSignature = &m_module->signatures[functionSignatureIndex];
-        } break;
+        }
+        break;
         case External::Table:
             // FIXME https://bugs.webkit.org/show_bug.cgi?id=164135
             break;
@@ -277,7 +284,9 @@ bool ModuleParser::parseFunction()
         if (typeNumber >= m_module->signatures.size())
             return false;
 
-        m_module->functions.uncheckedAppend({ &m_module->signatures[typeNumber], 0, 0 });
+        // The Code section fixes up start and end.
+        size_t start = 0, end = 0;
+        m_module->functions.uncheckedAppend({ &m_module->signatures[typeNumber], start, end });
     }
 
     return true;
@@ -343,29 +352,33 @@ bool ModuleParser::parseExport()
         uint32_t fieldLen;
         if (!parseVarUInt32(fieldLen))
             return false;
-        if (!consumeUTF8String(e.field, fieldLen))
+        String fieldString;
+        if (!consumeUTF8String(fieldString, fieldLen))
             return false;
+        e.field = Identifier::fromString(m_vm, fieldString);
         if (!parseExternalKind(e.kind))
             return false;
         switch (e.kind) {
         case External::Function: {
-            uint32_t functionSignatureIndex;
-            if (!parseVarUInt32(functionSignatureIndex))
+            if (!parseVarUInt32(e.functionIndex))
                 return false;
-            if (functionSignatureIndex >= m_module->signatures.size())
+            if (e.functionIndex >= m_module->functions.size())
                 return false;
-            e.functionSignature = &m_module->signatures[functionSignatureIndex];
-        } break;
-        case External::Table:
+        }
+        break;
+        case External::Table: {
             // FIXME https://bugs.webkit.org/show_bug.cgi?id=164135
-            break;
-        case External::Memory:
+        }
+        break;
+        case External::Memory: {
             // FIXME https://bugs.webkit.org/show_bug.cgi?id=164134
-            break;
-        case External::Global:
+        }
+        break;
+        case External::Global: {
             // FIXME https://bugs.webkit.org/show_bug.cgi?id=164133
             // In the MVP, only immutable global variables can be exported.
-            break;
+        }
+        break;
         }
 
         m_module->exports.uncheckedAppend(e);
