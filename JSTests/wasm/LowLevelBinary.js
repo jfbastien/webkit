@@ -234,6 +234,11 @@ export default class LowLevelBinary {
         }
         return { value: v, next: at };
     }
+    getVaruint1(at) {
+        const res = this.getVaruint32(at);
+        if (res.value !== 0 && res.value !== 1) throw new Error(`Expected a varuint1, got value ${res.value}`);
+        return res;
+    }
     getVaruint7(at) {
         const res = this.getVaruint32(at);
         if (res.value > varuint7Max) throw new Error(`Expected a varuint7, got value ${res.value}`);
