@@ -129,7 +129,7 @@ public:
 
     static constexpr ExpressionType emptyExpression = nullptr;
 
-    B3IRGenerator(Memory*, Procedure&, Vector<UnlinkedCall>& unlinkedCalls);
+    B3IRGenerator(Memory*, Procedure&, Vector<UnlinkedWasmToWasmCall>& unlinkedWasmToWasmCalls);
 
     bool WARN_UNUSED_RETURN addArguments(const Vector<Type>&);
     bool WARN_UNUSED_RETURN addLocal(Type, uint32_t);
@@ -183,16 +183,16 @@ private:
     BasicBlock* m_currentBlock;
     Vector<Variable*> m_locals;
     // m_unlikedCalls is list of each call site and the function index whose address it should be patched with.
-    Vector<UnlinkedCall>& m_unlinkedCalls;
+    Vector<UnlinkedWasmToWasmCall>& m_unlinkedWasmToWasmCalls;
     GPRReg m_memoryBaseGPR;
     GPRReg m_memorySizeGPR;
     Value* m_zeroValues[numTypes];
 };
 
-B3IRGenerator::B3IRGenerator(Memory* memory, Procedure& procedure, Vector<UnlinkedCall>& unlinkedCalls)
+B3IRGenerator::B3IRGenerator(Memory* memory, Procedure& procedure, Vector<UnlinkedWasmToWasmCall>& unlinkedWasmToWasmCalls)
     : m_memory(memory)
     , m_proc(procedure)
-    , m_unlinkedCalls(unlinkedCalls)
+    , m_unlinkedWasmToWasmCalls(unlinkedWasmToWasmCalls)
 {
     m_currentBlock = m_proc.addBlock();
 
@@ -598,8 +598,8 @@ bool B3IRGenerator::addCall(unsigned functionIndex, const FunctionInformation& i
 
     Type returnType = info.signature->returnType;
 
-    size_t callIndex = m_unlinkedCalls.size();
-    m_unlinkedCalls.grow(callIndex + 1);
+    size_t callIndex = m_unlinkedWasmToWasmCalls.size();
+    m_unlinkedWasmToWasmCalls.grow(callIndex + 1);
     result = wasmCallingConvention().setupCall(m_proc, m_currentBlock, Origin(), args, toB3Type(returnType),
         [&] (PatchpointValue* patchpoint) {
             patchpoint->effects.writesPinned = true;
@@ -611,7 +611,7 @@ bool B3IRGenerator::addCall(unsigned functionIndex, const FunctionInformation& i
                 CCallHelpers::Call call = jit.call();
 
                 jit.addLinkTask([=] (LinkBuffer& linkBuffer) {
-                    m_unlinkedCalls[callIndex] = { linkBuffer.locationOf(call), functionIndex };
+                    m_unlinkedWasmToWasmCalls[callIndex] = { linkBuffer.locationOf(call), functionIndex };
                 });
             });
         });
@@ -657,7 +657,7 @@ void B3IRGenerator::dump(const Vector<ControlEntry>& controlStack, const Express
     dataLogLn("\n");
 }
 
-static std::unique_ptr<Compilation> createJSWrapper(VM& vm, const Signature* signature, MacroAssemblerCodePtr mainFunction, Memory* memory)
+static std::unique_ptr<Compilation> createJSToWasmWrapper(VM& vm, const Signature* signature, MacroAssemblerCodePtr mainFunction, Memory* memory)
 {
     Procedure proc;
     BasicBlock* block = proc.addBlock();
@@ -736,12 +736,32 @@ static std::unique_ptr<Compilation> createJSWrapper(VM& vm, const Signature* sig
     return std::make_unique<Compilation>(vm, proc);
 }
 
+std::unique_ptr<FunctionCompilation> compileImportStubs(VM& vm, const Signature* signature, unsigned optLevel)
+{
+    auto result = std::make_unique<FunctionCompilation>();
+
+    // FIXME:
+    (void)vm;
+    (void)signature;
+    (void)optLevel;
+    // - Do the coercions.
+    // - Look up the VMEntryRecord.
+    // - Find the latest JSWebAssemblyInstance.
+    // - Use instance->getImportFunction(importNumber).
+    // - Call it.
+    // - Coerce the returned value.
+
+    // result->code = std::make_unique<Compilation>(vm, procedure, optLevel);
+    // Leave result->jsToWasmEntryPoint as nullptr: re-exporting an import should go directly to the imported JS function.
+    return result;
+}
+
 std::unique_ptr<FunctionCompilation> parseAndCompile(VM& vm, const uint8_t* functionStart, size_t functionLength, Memory* memory, const Signature* signature, const Vector<FunctionInformation>& functions, unsigned optLevel)
 {
     auto result = std::make_unique<FunctionCompilation>();
 
     Procedure procedure;
-    B3IRGenerator context(memory, procedure, result->unlinkedCalls);
+    B3IRGenerator context(memory, procedure, result->unlinkedWasmToWasmCalls);
     FunctionParser<B3IRGenerator> parser(context, functionStart, functionLength, signature, functions);
     if (!parser.parse())
         RELEASE_ASSERT_NOT_REACHED();
@@ -756,7 +776,7 @@ std::unique_ptr<FunctionCompilation> parseAndCompile(VM& vm, const uint8_t* func
         dataLog("Post SSA: ", procedure);
 
     result->code = std::make_unique<Compilation>(vm, procedure, optLevel);
-    result->jsEntryPoint = createJSWrapper(vm, signature, result->code->code(), memory);
+    result->jsToWasmEntryPoint = createJSToWasmWrapper(vm, signature, result->code->code(), memory);
     return result;
 }
 

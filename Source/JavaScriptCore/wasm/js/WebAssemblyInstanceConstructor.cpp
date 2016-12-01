@@ -31,6 +31,7 @@
 #include "FunctionPrototype.h"
 #include "JSCInlines.h"
 #include "JSModuleEnvironment.h"
+#include "JSModuleNamespaceObject.h"
 #include "JSWebAssemblyInstance.h"
 #include "JSWebAssemblyModule.h"
 #include "WebAssemblyInstancePrototype.h"
@@ -71,6 +72,77 @@ static EncodedJSValue JSC_HOST_CALL constructJSWebAssemblyInstance(ExecState* st
     if (moduleInformation.imports.size() && !importObject)
         return JSValue::encode(throwException(state, scope, createTypeError(state, ASCIILiteral("second argument to WebAssembly.Instance must be Object because the WebAssembly.Module has imports"), defaultSourceAppender, runtimeTypeForValue(importArgument))));
 
+    // Let funcs, memories and tables be initially-empty lists of callable JavaScript objects, WebAssembly.Memory objects and WebAssembly.Table objects, respectively.
+    // Let imports be an initially-empty list of external values.
+    Vector<WriteBarrier<JSCell>> importFunctions;
+    // FIXME implement Table https://bugs.webkit.org/show_bug.cgi?id=164135
+    // FIXME implement Memory https://bugs.webkit.org/show_bug.cgi?id=164134
+    // FIXME implement Global https://bugs.webkit.org/show_bug.cgi?id=164133
+
+    // For each import i in module.imports:
+    for (auto& import : moduleInformation.imports) {
+        // 1. Let o be the resultant value of performing Get(importObject, i.module_name).
+        JSValue m = importObject->get(state, import.module);
+        JSObject* o = jsDynamicCast<JSObject*>(m);
+        // 2. If Type(o) is not Object, throw a TypeError.
+        if (!o)
+            return JSValue::encode(throwException(state, scope, createTypeError(state, ASCIILiteral("import must be an object"), defaultSourceAppender, runtimeTypeForValue(m))));
+        // 3. Let v be the value of performing Get(o, i.item_name)
+        JSValue v = o->get(state, import.field);
+        switch (import.kind) {
+        case Wasm::External::Function: {
+            // 4. If i is a function import:
+            // i. If IsCallable(v) is false, throw a TypeError.
+            if (!v.isFunction())
+                return JSValue::encode(throwException(state, scope, createTypeError(state, ASCIILiteral("import function must be callable"), defaultSourceAppender, runtimeTypeForValue(v))));
+            JSCell* cell = v.asCell();
+            // ii. If v is an Exported Function Exotic Object:
+            if (JSModuleNamespaceObject* importedExports = jsDynamicCast<JSModuleNamespaceObject*>(o)) {
+                // FIXME handle Function Exotic Object properly. https://bugs.webkit.org/show_bug.cgi?id=165282
+                // a. If the signature of v does not match the signature of i, throw a TypeError.
+                // b. Let closure be v.[[Closure]].
+                RELEASE_ASSERT_NOT_REACHED();
+                UNUSED_PARAM(importedExports);
+                break;
+            }
+            // iii. Otherwise:
+            // a. Let closure be a new host function of the given signature which calls v by coercing WebAssembly arguments to JavaScript arguments via ToJSValue and returns the result, if any, by coercing via ToWebAssemblyValue.
+            // Note: done as part of Plan compilation.
+            // iv. Append v to funcs.
+            importFunctions.uncheckedAppend(WriteBarrier<JSCell>(vm, o, cell));
+            // v. Append closure to imports.
+        }
+        break;
+        case Wasm::External::Table: {
+            // 7. Otherwise (i is a table import):
+            // FIXME implement Table https://bugs.webkit.org/show_bug.cgi?id=164135
+            // i. If v is not a WebAssembly.Table object, throw a TypeError.
+            // ii. Append v to tables.
+            // iii. Append v.[[Table]] to imports.
+            RELEASE_ASSERT_NOT_REACHED();
+        }
+        break;
+        case Wasm::External::Memory: {
+            // 6. If i is a memory import:
+            // FIXME implement Memory https://bugs.webkit.org/show_bug.cgi?id=164134
+            // i. If v is not a WebAssembly.Memory object, throw a TypeError.
+            // ii. Append v to memories.
+            // iii. Append v.[[Memory]] to imports.
+            RELEASE_ASSERT_NOT_REACHED();
+        }
+        break;
+        case Wasm::External::Global: {
+            // 5. If i is a global import:
+            // FIXME implement Global https://bugs.webkit.org/show_bug.cgi?id=164133
+            // i. If i is not an immutable global, throw a TypeError.
+            // ii. If Type(v) is not Number, throw a TypeError.
+            // iii. Append ToWebAssemblyValue(v) to imports.
+            RELEASE_ASSERT_NOT_REACHED();
+        }
+        break;
+        }
+    }
+
     Identifier moduleKey = Identifier::fromUid(PrivateName(PrivateName::Description, "WebAssemblyInstance"));
     WebAssemblyModuleRecord* moduleRecord = WebAssemblyModuleRecord::create(state, vm, globalObject->webAssemblyModuleRecordStructure(), moduleKey, moduleInformation);
     RETURN_IF_EXCEPTION(scope, encodedJSValue());
@@ -78,7 +150,7 @@ static EncodedJSValue JSC_HOST_CALL constructJSWebAssemblyInstance(ExecState* st
     Structure* instanceStructure = InternalFunction::createSubclassStructure(state, state->newTarget(), globalObject->WebAssemblyInstanceStructure());
     RETURN_IF_EXCEPTION(scope, encodedJSValue());
 
-    JSWebAssemblyInstance* instance = JSWebAssemblyInstance::create(vm, instanceStructure, jsModule, moduleRecord->getModuleNamespace(state));
+    JSWebAssemblyInstance* instance = JSWebAssemblyInstance::create(vm, instanceStructure, jsModule, moduleRecord->getModuleNamespace(state), WTFMove(importFunctions));
     RETURN_IF_EXCEPTION(scope, encodedJSValue());
 
     moduleRecord->link(state, instance);

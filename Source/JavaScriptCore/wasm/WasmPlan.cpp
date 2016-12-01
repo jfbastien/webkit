@@ -70,15 +70,38 @@ void Plan::run()
     if (verbose)
         dataLogLn("Parsed module.");
 
-    if (!m_compiledFunctions.tryReserveCapacity(m_moduleInformation->functions.size())) {
+    size_t numFunctions = m_moduleInformation->numImportFunctions + m_moduleInformation->functions.size();
+    if (!m_compiledFunctions.tryReserveCapacity(numFunctions)) {
         StringBuilder builder;
         builder.appendLiteral("Failed allocating enough space for ");
-        builder.appendNumber(m_moduleInformation->functions.size());
+        builder.appendNumber(numFunctions);
         builder.appendLiteral(" compiled functions");
         m_errorMessage = builder.toString();
         return;
     }
 
+    for (const Import& import : m_moduleInformation->imports) {
+        switch (import.kind) {
+        case External::Function:
+            if (verbose)
+                dataLogLn("Processing import function ", import.module, " ", import.field);
+            // Imports come before WebAssembly functions in the function index space.
+            m_compiledFunctions.uncheckedAppend(compileImportStubs(*m_vm, import.functionSignature));
+            break;
+        case External::Table:
+            // FIXME implement Table https://bugs.webkit.org/show_bug.cgi?id=164135
+            RELEASE_ASSERT_NOT_REACHED();
+        case External::Memory:
+            // FIXME implement Memory https://bugs.webkit.org/show_bug.cgi?id=164134
+            RELEASE_ASSERT_NOT_REACHED();
+        case External::Global:
+            // FIXME implement Global https://bugs.webkit.org/show_bug.cgi?id=164133
+            RELEASE_ASSERT_NOT_REACHED();
+        }
+    }
+    ASSERT(m_compiledFunctions.size() == m_moduleInformation->numImportFunctions);
+
+    // WebAssembly functions come after imports in the function index space.
     for (const FunctionInformation& info : m_moduleInformation->functions) {
         if (verbose)
             dataLogLn("Processing function starting at: ", info.start, " and ending at: ", info.end);
@@ -99,11 +122,12 @@ void Plan::run()
 
         m_compiledFunctions.uncheckedAppend(parseAndCompile(*m_vm, functionStart, functionLength, m_moduleInformation->memory.get(), info.signature, m_moduleInformation->functions));
     }
+    ASSERT(m_compiledFunctions.size() == numFunctions);
 
-    // Patch the call sites for each function.
+    // Patch the call sites for each WebAssembly function.
     for (std::unique_ptr<FunctionCompilation>& functionPtr : m_compiledFunctions) {
         FunctionCompilation* function = functionPtr.get();
-        for (auto& call : function->unlinkedCalls)
+        for (auto& call : function->unlinkedWasmToWasmCalls)
             MacroAssembler::repatchCall(call.callLocation, CodeLocationLabel(m_compiledFunctions[call.functionIndex]->code->code()));
     }
 

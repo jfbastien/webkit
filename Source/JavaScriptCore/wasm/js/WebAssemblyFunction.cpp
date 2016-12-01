@@ -51,7 +51,7 @@ static EncodedJSValue JSC_HOST_CALL callWebAssemblyFunction(ExecState* state)
     if (!callee)
         return JSValue::encode(throwException(state, scope, createTypeError(state, "expected a WebAssembly function", defaultSourceAppender, runtimeTypeForValue(state->callee()))));
     const CallableWebAssemblyFunction& callable = callee->webAssemblyFunctionCell()->function();
-    const B3::Compilation* jsEntryPoint = callable.jsEntryPoint;
+    const B3::Compilation* jsToWasmEntryPoint = callable.jsToWasmEntryPoint;
     const Wasm::Signature* signature = callable.signature;
 
     // FIXME is this the right behavior? https://bugs.webkit.org/show_bug.cgi?id=164876
@@ -94,8 +94,12 @@ static EncodedJSValue JSC_HOST_CALL callWebAssemblyFunction(ExecState* state)
 
     ProtoCallFrame protoCallFrame;
     protoCallFrame.init(nullptr, callee, firstArgument, argCount, remainingArgs);
-    
-    EncodedJSValue rawResult = vmEntryToWasm(jsEntryPoint->code().executableAddress(), &vm, &protoCallFrame);
+
+    JSWebAssemblyInstance* prevJSWebAssemblyInstance = vm.topJSWebAssemblyInstance;
+    vm.topJSWebAssemblyInstance = callee->instance();
+    EncodedJSValue rawResult = vmEntryToWasm(jsToWasmEntryPoint->code().executableAddress(), &vm, &protoCallFrame);
+    vm.topJSWebAssemblyInstance = prevJSWebAssemblyInstance;
+
     // FIXME is this correct? https://bugs.webkit.org/show_bug.cgi?id=164876
     switch (signature->returnType) {
     case Wasm::Void:

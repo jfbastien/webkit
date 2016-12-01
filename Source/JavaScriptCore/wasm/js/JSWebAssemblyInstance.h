@@ -29,6 +29,7 @@
 
 #include "JSDestructibleObject.h"
 #include "JSObject.h"
+#include <wtf/Vector.h>
 
 namespace JSC {
 
@@ -40,7 +41,7 @@ public:
     typedef JSDestructibleObject Base;
 
 
-    static JSWebAssemblyInstance* create(VM&, Structure*, JSWebAssemblyModule*, JSModuleNamespaceObject*);
+    static JSWebAssemblyInstance* create(VM&, Structure*, JSWebAssemblyModule*, JSModuleNamespaceObject*, Vector<WriteBarrier<JSCell>>&&);
     static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
     DECLARE_INFO;
@@ -51,15 +52,18 @@ public:
         return m_module.get();
     }
 
+    JSCell* getImportFunction(unsigned num) const { return m_importFunctions[num].get(); }
+
 protected:
     JSWebAssemblyInstance(VM&, Structure*);
-    void finishCreation(VM&, JSWebAssemblyModule*, JSModuleNamespaceObject*);
+    void finishCreation(VM&, JSWebAssemblyModule*, JSModuleNamespaceObject*, Vector<WriteBarrier<JSCell>>&&);
     static void destroy(JSCell*);
     static void visitChildren(JSCell*, SlotVisitor&);
 
 private:
     WriteBarrier<JSWebAssemblyModule> m_module;
     WriteBarrier<JSModuleNamespaceObject> m_moduleNamespaceObject;
+    Vector<WriteBarrier<JSCell>> m_importFunctions;
 };
 
 } // namespace JSC

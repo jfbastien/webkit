@@ -131,6 +131,8 @@ macro doVMEntry(makeCall)
     storep t4, VMEntryRecord::m_prevTopCallFrame[sp]
     loadp VM::topVMEntryFrame[vm], t4
     storep t4, VMEntryRecord::m_prevTopVMEntryFrame[sp]
+    loadp VM::topJSWebAssemblyInstance[vm], t4
+    storep t4, VMEntryRecord::m_prevJSWebAssemblyInstance[sp]
 
     loadi ProtoCallFrame::paddedArgCount[protoCallFrame], t4
     addp CallFrameHeaderSlots, t4, t4
@@ -171,6 +173,8 @@ macro doVMEntry(makeCall)
     storep extraTempReg, VM::topCallFrame[vm]
     loadp VMEntryRecord::m_prevTopVMEntryFrame[t4], extraTempReg
     storep extraTempReg, VM::topVMEntryFrame[vm]
+    loadp VMEntryRecord::m_prevJSWebAssemblyInstance[t4], extraTempReg
+    storep extraTempReg, VM::topJSWebAssemblyInstance[vm]
 
     subp cfr, CalleeRegisterSaveSize, sp
 
@@ -235,6 +239,8 @@ macro doVMEntry(makeCall)
     storep t2, VM::topCallFrame[vm]
     loadp VMEntryRecord::m_prevTopVMEntryFrame[t4], t2
     storep t2, VM::topVMEntryFrame[vm]
+    loadp VMEntryRecord::m_prevJSWebAssemblyInstance[t4], t2
+    storep t2, VM::topJSWebAssemblyInstance[vm]
 
     subp cfr, CalleeRegisterSaveSize, sp
 

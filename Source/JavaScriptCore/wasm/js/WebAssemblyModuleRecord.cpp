@@ -125,9 +125,9 @@ void WebAssemblyModuleRecord::link(ExecState* state, JSWebAssemblyInstance* inst
             //     b. Append func to funcs.
             //     c. Return func.
             const Wasm::FunctionCompilation* compiledFunction = compiledFunctions.at(exp.functionIndex).get();
-            const B3::Compilation* jsEntryPoint = compiledFunction->jsEntryPoint.get();
+            const B3::Compilation* jsToWasmEntryPoint = compiledFunction->jsToWasmEntryPoint.get();
             const Wasm::Signature* signature = moduleInformation.functions.at(exp.functionIndex).signature;
-            WebAssemblyFunction* function = WebAssemblyFunction::create(vm, globalObject, signature->arguments.size(), exp.field.string(), instance, CallableWebAssemblyFunction(jsEntryPoint, signature));
+            WebAssemblyFunction* function = WebAssemblyFunction::create(vm, globalObject, signature->arguments.size(), exp.field.string(), instance, CallableWebAssemblyFunction(jsToWasmEntryPoint, signature));
             exportedValue = function;
             break;
         }

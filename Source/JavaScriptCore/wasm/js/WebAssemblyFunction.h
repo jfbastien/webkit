@@ -51,10 +51,10 @@ class CallableWebAssemblyFunction {
 public:
     CallableWebAssemblyFunction(CallableWebAssemblyFunction&&) = default;
 
-    const B3::Compilation* jsEntryPoint;
+    const B3::Compilation* jsToWasmEntryPoint;
     const Wasm::Signature* signature;
-    CallableWebAssemblyFunction(const B3::Compilation* jsEntryPoint, const Wasm::Signature* signature)
-        : jsEntryPoint(jsEntryPoint)
+    CallableWebAssemblyFunction(const B3::Compilation* jsToWasmEntryPoint, const Wasm::Signature* signature)
+        : jsToWasmEntryPoint(jsToWasmEntryPoint)
         , signature(signature)
     {
     }
@@ -71,6 +71,7 @@ public:
     JS_EXPORT_PRIVATE static WebAssemblyFunction* create(VM&, JSGlobalObject*, int, const String&, JSWebAssemblyInstance*, CallableWebAssemblyFunction&&);
     static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
+    JSWebAssemblyInstance* instance() const { return m_instance.get(); }
     const WebAssemblyFunctionCell* webAssemblyFunctionCell() const { return m_functionCell.get(); }
 
 protected:

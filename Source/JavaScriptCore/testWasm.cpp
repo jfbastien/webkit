@@ -332,10 +332,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 2);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 101);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(122) }), 123);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 101);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(122) }), 123);
     }
 
     {
@@ -378,15 +378,15 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 213);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 212);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2) }), 211);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(3) }), 210);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(3) }), 210);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(4) }), 214);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(5) }), 214);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(-1) }), 214);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(-1000) }), 214);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 213);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 212);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2) }), 211);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(3) }), 210);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(3) }), 210);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(4) }), 214);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(5) }), 214);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(-1) }), 214);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(-1000) }), 214);
     }
 
     {
@@ -416,10 +416,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 22);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 20);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(11) }), 20);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(-100) }), 20);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 22);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 20);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(11) }), 20);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(-100) }), 20);
     }
 
     {
@@ -449,8 +449,8 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(32) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(32) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(32) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(32) }), 2);
     }
 
     {
@@ -476,8 +476,8 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(32) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(32) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(32) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(32) }), 2);
     }
 
     {
@@ -514,14 +514,14 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(2) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(6) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(6) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(2) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(6) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(6) }), 0);
     }
 
     {
@@ -544,10 +544,10 @@ static void runWasmTests()
         checkPlan(plan, 2);
 
         // Test this doesn't crash.
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsEntryPoint, { boxf(0.0), boxf(1.5) }), -1.5f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsEntryPoint, { boxf(100.1234), boxf(12.5) }), 87.6234f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsEntryPoint, { boxf(0.0), boxf(1.5) }), -1.5f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsEntryPoint, { boxf(100.1234), boxf(12.5) }), 87.6234f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { boxf(0.0), boxf(1.5) }), -1.5f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { boxf(100.1234), boxf(12.5) }), 87.6234f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { boxf(0.0), boxf(1.5) }), -1.5f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { boxf(100.1234), boxf(12.5) }), 87.6234f));
     }
 
     {
@@ -570,10 +570,10 @@ static void runWasmTests()
         checkPlan(plan, 2);
 
         // Test this doesn't crash.
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsEntryPoint, { boxf(0.0), boxf(1.5) }), 1.5f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsEntryPoint, { boxf(100.1234), boxf(12.5) }), 112.6234f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsEntryPoint, { boxf(0.0), boxf(1.5) }), 1.5f));
-        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsEntryPoint, { boxf(100.1234), boxf(12.5) }), 112.6234f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { boxf(0.0), boxf(1.5) }), 1.5f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { boxf(100.1234), boxf(12.5) }), 112.6234f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { boxf(0.0), boxf(1.5) }), 1.5f));
+        CHECK(isIdentical(invoke<float>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { boxf(100.1234), boxf(12.5) }), 112.6234f));
     }
 
     {
@@ -601,11 +601,11 @@ static void runWasmTests()
         checkPlan(plan, 2);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(100) }), 1200);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(1) }), 12);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2), box(3), box(4), box(5), box(6), box(7), box(8), box(9), box(10), box(11), box(12) }), 78);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2), box(3), box(4), box(5), box(6), box(7), box(8), box(9), box(10), box(11), box(100) }), 166);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(100) }), 1200);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(1) }), 12);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2), box(3), box(4), box(5), box(6), box(7), box(8), box(9), box(10), box(11), box(12) }), 78);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2), box(3), box(4), box(5), box(6), box(7), box(8), box(9), box(10), box(11), box(100) }), 166);
     }
 
     {
@@ -632,10 +632,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2) }), 2);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(4) }), 24);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(4) }), 24);
     }
 
     {
@@ -658,12 +658,12 @@ static void runWasmTests()
         checkPlan(plan, 2);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(0), box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(100), box(0) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(1), box(15) }), 16);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 200);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(0), box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(100), box(0) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(1), box(15) }), 16);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 200);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 2);
     }
 
     {
@@ -686,12 +686,12 @@ static void runWasmTests()
         checkPlan(plan, 2);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(100) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsEntryPoint, { box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(100) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(1)->jsToWasmEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 1);
     }
 
     {
@@ -715,9 +715,9 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
     }
 
     {
@@ -742,9 +742,9 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
     }
 
     {
@@ -783,7 +783,7 @@ static void runWasmTests()
         unsigned length = 5;
         unsigned offset = sizeof(uint32_t);
         uint32_t* memory = static_cast<uint32_t*>(plan.memory()->memory());
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(offset), box(length) });
         offset /= sizeof(uint32_t);
         CHECK_EQ(memory[offset - 1], 0u);
         CHECK_EQ(memory[offset + length], 0u);
@@ -792,7 +792,7 @@ static void runWasmTests()
 
         length = 10;
         offset = 5 * sizeof(uint32_t);
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(5), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(5), box(offset), box(length) });
         offset /= sizeof(uint32_t);
         CHECK_EQ(memory[offset - 1], 100u);
         CHECK_EQ(memory[offset + length], 0u);
@@ -835,7 +835,7 @@ static void runWasmTests()
         unsigned length = 5;
         unsigned offset = 1;
         uint8_t* memory = static_cast<uint8_t*>(plan.memory()->memory());
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(offset), box(length) });
         CHECK_EQ(memory[offset - 1], 0u);
         CHECK_EQ(memory[offset + length], 0u);
         for (unsigned i = 0; i < length; ++i)
@@ -843,7 +843,7 @@ static void runWasmTests()
 
         length = 10;
         offset = 5;
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(5), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(5), box(offset), box(length) });
         CHECK_EQ(memory[offset - 1], 100u);
         CHECK_EQ(memory[offset + length], 0u);
         for (unsigned i = 0; i < length; ++i)
@@ -873,9 +873,9 @@ static void runWasmTests()
         ASSERT(plan.memory()->size());
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
     }
 
     {
@@ -900,9 +900,9 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 1);
     }
 
     {
@@ -927,10 +927,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(-12), box(plan.memory()->size() - sizeof(uint64_t)) }), -12);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(-12), box(plan.memory()->size() - sizeof(uint64_t)) }), -12);
     }
 
     {
@@ -955,9 +955,9 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
     }
 
     {
@@ -996,7 +996,7 @@ static void runWasmTests()
         unsigned length = 5;
         unsigned offset = sizeof(uint32_t);
         uint32_t* memory = static_cast<uint32_t*>(plan.memory()->memory());
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(offset), box(length) });
         offset /= sizeof(uint32_t);
         CHECK_EQ(memory[offset - 1], 0u);
         CHECK_EQ(memory[offset + length], 0u);
@@ -1005,7 +1005,7 @@ static void runWasmTests()
 
         length = 10;
         offset = 5 * sizeof(uint32_t);
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(5), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(5), box(offset), box(length) });
         offset /= sizeof(uint32_t);
         CHECK_EQ(memory[offset - 1], 100u);
         CHECK_EQ(memory[offset + length], 0u);
@@ -1048,7 +1048,7 @@ static void runWasmTests()
         unsigned length = 5;
         unsigned offset = 1;
         uint8_t* memory = static_cast<uint8_t*>(plan.memory()->memory());
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(offset), box(length) });
         CHECK_EQ(memory[offset - 1], 0u);
         CHECK_EQ(memory[offset + length], 0u);
         for (unsigned i = 0; i < length; ++i)
@@ -1056,7 +1056,7 @@ static void runWasmTests()
 
         length = 10;
         offset = 5;
-        invoke<void>(*plan.compiledFunction(0)->jsEntryPoint, { box(5), box(offset), box(length) });
+        invoke<void>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(5), box(offset), box(length) });
         CHECK_EQ(memory[offset - 1], 100u);
         CHECK_EQ(memory[offset + length], 0u);
         for (unsigned i = 0; i < length; ++i)
@@ -1086,9 +1086,9 @@ static void runWasmTests()
         ASSERT(plan.memory()->size());
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(10) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(2) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(100) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(10) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(2) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(100) }), 1);
     }
 
     {
@@ -1113,9 +1113,9 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 100);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 100);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 1);
     }
 
     {
@@ -1140,14 +1140,14 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(0) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(2) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(6) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(6) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(0) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(2) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(6) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(6) }), 1);
     }
 
     {
@@ -1178,14 +1178,14 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(2) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(6) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(6) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(2) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(6) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(6) }), 0);
     }
 
 
@@ -1202,7 +1202,7 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { }), 5);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { }), 5);
     }
 
 
@@ -1220,7 +1220,7 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { }), 11);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { }), 11);
     }
 
     {
@@ -1237,7 +1237,7 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { }), 11);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { }), 11);
     }
 
     {
@@ -1254,7 +1254,7 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { }), 11);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { }), 11);
     }
 
     {
@@ -1270,10 +1270,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(1) }), 101);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(-1), box(1)}), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(std::numeric_limits<int>::max()), box(1) }), std::numeric_limits<int>::min());
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(1) }), 101);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(-1), box(1)}), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(std::numeric_limits<int>::max()), box(1) }), std::numeric_limits<int>::min());
     }
 
     {
@@ -1296,8 +1296,8 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(10) }), 10);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(10) }), 10);
     }
 
     {
@@ -1329,10 +1329,10 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2)}), 3);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100) }), 5050);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2)}), 3);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100) }), 5050);
     }
 
     {
@@ -1370,14 +1370,14 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(1) }), 2);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2) }), 2);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(2) }), 4);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(6) }), 12);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(6) }), 600);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(100) }), 10000);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(1) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2) }), 2);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(2) }), 4);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(6) }), 12);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(6) }), 600);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(100) }), 10000);
     }
 
     {
@@ -1420,14 +1420,14 @@ static void runWasmTests()
         checkPlan(plan, 1);
 
         // Test this doesn't crash.
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(0), box(1) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(0) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(2) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(2) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(1), box(1) }), 0);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(2), box(6) }), 1);
-        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsEntryPoint, { box(100), box(6) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(0), box(1) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(0) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(2) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(2) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(1), box(1) }), 0);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(2), box(6) }), 1);
+        CHECK_EQ(invoke<int>(*plan.compiledFunction(0)->jsToWasmEntryPoint, { box(100), box(6) }), 0);
     }
 
 }

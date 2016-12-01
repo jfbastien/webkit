@@ -120,6 +120,7 @@ struct Export {
 
 struct ModuleInformation {
     Vector<Signature> signatures;
+    unsigned numImportFunctions = 0;
     Vector<Import> imports;
     Vector<FunctionInformation> functions;
     std::unique_ptr<Memory> memory;
@@ -128,15 +129,15 @@ struct ModuleInformation {
     ~ModuleInformation();
 };
 
-struct UnlinkedCall {
+struct UnlinkedWasmToWasmCall {
     CodeLocationCall callLocation;
     size_t functionIndex;
 };
 
 struct FunctionCompilation {
-    Vector<UnlinkedCall> unlinkedCalls;
+    Vector<UnlinkedWasmToWasmCall> unlinkedWasmToWasmCalls;
     std::unique_ptr<B3::Compilation> code;
-    std::unique_ptr<B3::Compilation> jsEntryPoint;
+    std::unique_ptr<B3::Compilation> jsToWasmEntryPoint;
 };
 
 typedef Vector<std::unique_ptr<FunctionCompilation>> CompiledFunctions;

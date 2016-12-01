@@ -31,6 +31,7 @@ namespace JSC {
 
 struct VMEntryFrame;
 class ExecState;
+class JSWebAssemblyInstance;
 class VM;
 
 struct VMEntryRecord {
@@ -41,6 +42,7 @@ struct VMEntryRecord {
     VM* m_vm;
     ExecState* m_prevTopCallFrame;
     VMEntryFrame* m_prevTopVMEntryFrame;
+    JSWebAssemblyInstance* m_prevJSWebAssemblyInstance;
 
 #if ENABLE(JIT) && NUMBER_OF_CALLEE_SAVES_REGISTERS > 0
     intptr_t calleeSaveRegistersBuffer[NUMBER_OF_CALLEE_SAVES_REGISTERS];

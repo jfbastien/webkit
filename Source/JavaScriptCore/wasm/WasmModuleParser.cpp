@@ -247,6 +247,7 @@ bool ModuleParser::parseImport()
             if (functionSignatureIndex >= m_module->signatures.size())
                 return false;
             imp.functionSignature = &m_module->signatures[functionSignatureIndex];
+            ++m_module->numImportFunctions;
             break;
         }
         case External::Table: {
@@ -365,7 +366,7 @@ bool ModuleParser::parseExport()
         case External::Function: {
             if (!parseVarUInt32(exp.functionIndex))
                 return false;
-            if (exp.functionIndex >= m_module->functions.size())
+            if (exp.functionIndex >= m_module->numImportFunctions + m_module->functions.size())
                 return false;
             break;
         }

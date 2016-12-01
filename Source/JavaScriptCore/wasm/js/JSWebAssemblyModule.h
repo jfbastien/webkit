@@ -53,6 +53,7 @@ protected:
     void finishCreation(VM&, SymbolTable*);
     static void destroy(JSCell*);
     static void visitChildren(JSCell*, SlotVisitor&);
+
 private:
     std::unique_ptr<Wasm::ModuleInformation> m_moduleInformation;
     Wasm::CompiledFunctions m_compiledFunctions;
