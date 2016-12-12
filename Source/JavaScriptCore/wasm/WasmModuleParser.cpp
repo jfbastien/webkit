@@ -40,33 +40,23 @@ namespace JSC { namespace Wasm {
 
 static const bool verbose = false;
 
-bool ModuleParser::parse()
+auto ModuleParser::parse() -> Result
 {
     m_module = std::make_unique<ModuleInformation>();
 
     const size_t minSize = 8;
-    if (length() < minSize) {
-        m_errorMessage = "Module is " + String::number(length()) + " bytes, expected at least " + String::number(minSize) + " bytes";
-        return false;
-    }
-    if (!consumeCharacter(0) || !consumeString("asm")) {
-        m_errorMessage = "Modules doesn't start with '\\0asm'";
-        return false;
-    }
+    if (UNLIKELY(length() < minSize))
+        return fail("expected a module of at least ", minSize, " bytes");
+
+    if (UNLIKELY(!consumeCharacter(0) || !consumeString("asm")))
+        return fail("modules doesn't start with '\\0asm'");
 
     uint32_t versionNumber;
-    if (!parseUInt32(versionNumber)) {
-        // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-        m_errorMessage = "couldn't parse version number";
-        return false;
-    }
+    if (UNLIKELY(!parseUInt32(versionNumber)))
+        return fail("couldn't parse version number");
 
-    if (versionNumber != expectedVersionNumber) {
-        // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-        m_errorMessage = "unexpected version number";
-        return false;
-    }
-
+    if (UNLIKELY(versionNumber != expectedVersionNumber))
+        return fail("unexpected version number ", versionNumber, " expected ", expectedVersionNumber);
 
     if (verbose)
         dataLogLn("Passed processing header.");
@@ -77,11 +67,8 @@ bool ModuleParser::parse()
             dataLogLn("Starting to parse next section at offset: ", m_offset);
 
         uint8_t sectionByte;
-        if (!parseUInt7(sectionByte)) {
-            // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-            m_errorMessage = "couldn't get section byte";
-            return false;
-        }
+        if (UNLIKELY(!parseUInt7(sectionByte)))
+            return fail("couldn't get section byte");
 
         if (verbose)
             dataLogLn("Section byte: ", sectionByte);
@@ -92,38 +79,27 @@ bool ModuleParser::parse()
                 section = static_cast<Sections::Section>(sectionByte);
         }
 
-        if (!Sections::validateOrder(previousSection, section)) {
-            // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-            m_errorMessage = "invalid section order";
-            return false;
-        }
+        if (UNLIKELY(!Sections::validateOrder(previousSection, section)))
+            return fail("invalid section order, ", previousSection, " followed by ", section);
 
         uint32_t sectionLength;
-        if (!parseVarUInt32(sectionLength)) {
-            // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-            m_errorMessage = "couldn't get section length";
-            return false;
-        }
+        if (UNLIKELY(!parseVarUInt32(sectionLength)))
+            return fail("couldn't get ", section, " section's length");
 
-        if (sectionLength > length() - m_offset) {
-            // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-            m_errorMessage = "section content would overflow Module's size";
-            return false;
-        }
+        if (UNLIKELY(sectionLength > length() - m_offset))
+            return fail(section, "section of size ", sectionLength, " would overflow Module's size");
 
         auto end = m_offset + sectionLength;
 
         switch (section) {
-        // FIXME improve error message in macro below https://bugs.webkit.org/show_bug.cgi?id=163919
-#define WASM_SECTION_PARSE(NAME, ID, DESCRIPTION) \
-        case Sections::NAME: { \
-            if (verbose) \
-                dataLogLn("Parsing " DESCRIPTION); \
-            if (!parse ## NAME()) { \
-                m_errorMessage = "couldn't parse section " #NAME ": " DESCRIPTION; \
-                return false; \
-            } \
-            break; \
+#define WASM_SECTION_PARSE(NAME, ID, DESCRIPTION)                       \
+            case Sections::NAME: {                                      \
+                if (verbose)                                            \
+                    dataLogLn("Parsing " DESCRIPTION);                  \
+                Result result = parse ## NAME();                        \
+                if (UNLIKELY(!!result))                                 \
+                    return result;                                      \
+                break;                                                  \
         }
         FOR_EACH_WASM_SECTION(WASM_SECTION_PARSE)
 #undef WASM_SECTION_PARSE
@@ -140,21 +116,16 @@ bool ModuleParser::parse()
         if (verbose)
             dataLogLn("Finished parsing section.");
 
-        if (end != m_offset) {
-            // FIXME improve error message https://bugs.webkit.org/show_bug.cgi?id=163919
-            m_errorMessage = "parsing ended before the end of the section";
-            return false;
-        }
+        if (UNLIKELY(end != m_offset))
+            return fail("parsing ended before the end of ", section, " section");
 
         previousSection = section;
     }
 
-    // TODO
-    m_failed = false;
-    return true;
+    return Result();
 }
 
-bool ModuleParser::parseType()
+auto ModuleParser::parseType() -> Result
 {
     uint32_t count;
     if (!parseVarUInt32(count)
@@ -211,7 +182,7 @@ bool ModuleParser::parseType()
     return true;
 }
 
-bool ModuleParser::parseImport()
+auto ModuleParser::parseImport() -> Result
 {
     uint32_t importCount;
     if (!parseVarUInt32(importCount)
@@ -272,7 +243,7 @@ bool ModuleParser::parseImport()
     return true;
 }
 
-bool ModuleParser::parseFunction()
+auto ModuleParser::parseFunction() -> Result
 {
     uint32_t count;
     if (!parseVarUInt32(count)
@@ -300,14 +271,14 @@ bool ModuleParser::parseFunction()
     return true;
 }
 
-bool ModuleParser::parseTable()
+auto ModuleParser::parseTable() -> Result
 {
     // FIXME implement table https://bugs.webkit.org/show_bug.cgi?id=164135
     RELEASE_ASSERT_NOT_REACHED();
     return true;
 }
 
-bool ModuleParser::parseMemoryHelper(bool isImport)
+auto ModuleParser::parseMemoryHelper(bool isImport) -> Result
 {
     // We don't allow redeclaring memory. Either via import or definition.
     if (m_module->memory)
@@ -345,7 +316,7 @@ bool ModuleParser::parseMemoryHelper(bool isImport)
     return true;
 }
 
-bool ModuleParser::parseMemory()
+auto ModuleParser::parseMemory() -> Result
 {
     uint8_t count;
     if (!parseVarUInt1(count))
@@ -362,14 +333,14 @@ bool ModuleParser::parseMemory()
     return parseMemoryHelper(isImport);
 }
 
-bool ModuleParser::parseGlobal()
+auto ModuleParser::parseGlobal() -> Result
 {
     // FIXME https://bugs.webkit.org/show_bug.cgi?id=164133
     RELEASE_ASSERT_NOT_REACHED();
     return true;
 }
 
-bool ModuleParser::parseExport()
+auto ModuleParser::parseExport() -> Result
 {
     uint32_t exportCount;
     if (!parseVarUInt32(exportCount)
@@ -417,7 +388,7 @@ bool ModuleParser::parseExport()
     return true;
 }
 
-bool ModuleParser::parseStart()
+auto ModuleParser::parseStart() -> Result
 {
     uint32_t startFunctionIndex;
     if (!parseVarUInt32(startFunctionIndex)
@@ -431,14 +402,14 @@ bool ModuleParser::parseStart()
     return true;
 }
 
-bool ModuleParser::parseElement()
+auto ModuleParser::parseElement() -> Result
 {
     // FIXME https://bugs.webkit.org/show_bug.cgi?id=161709
     RELEASE_ASSERT_NOT_REACHED();
     return true;
 }
 
-bool ModuleParser::parseCode()
+auto ModuleParser::parseCode() -> Result
 {
     uint32_t count;
     if (!parseVarUInt32(count)
@@ -461,7 +432,7 @@ bool ModuleParser::parseCode()
     return true;
 }
 
-bool ModuleParser::parseData()
+auto ModuleParser::parseData() -> Result
 {
     uint32_t segmentCount;
     if (!parseVarUInt32(segmentCount)

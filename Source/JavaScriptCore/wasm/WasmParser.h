@@ -33,12 +33,16 @@
 #include "WasmOps.h"
 #include "WasmSections.h"
 #include <wtf/LEBDecoder.h>
+#include <wtf/Expected.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/WTFString.h>
 
 namespace JSC { namespace Wasm {
 
 class Parser {
+public:
+    typepdef Expected<void, String> Result;
+
 protected:
     Parser(const uint8_t*, size_t);
 
@@ -63,9 +67,25 @@ protected:
 
     size_t m_offset = 0;
 
+    static auto boxFailure(const char *failure) { return ASCIILiteral(failure); }
+    static auto boxFailure(Sections::Section failure) { return Sections::name(failure); }
+    template <typename Int, void* = std::enable_if<std::type_trait<std::is_integral<Int>::value, nullptr>::value>
+    static auto boxFailure(Int failure) { return String::Number(failure); }
+    template <typename ...Args>
+    NEVER_INLINE static Result::ErrorType WARN_UNUSED_RETURN fail(Args... args)
+    {
+        return Result::ErrorType(makeString(ASCIILiteral("WebAssembly.Module doesn't parse at byte "), String::number(m_offset), ASCIILiteral(" / "), String::number(m_sourceLength), ASCIILiteral(": "), boxFailure(args)...));
+    }
+
+    bool WARN_UNUSED_RETURN failed() const
+    {
+        return !!m_result;
+    }
+
 private:
     const uint8_t* m_source;
     size_t m_sourceLength;
+    Result m_result;
 };
 
 ALWAYS_INLINE Parser::Parser(const uint8_t* sourceBuffer, size_t sourceLength)

@@ -55,6 +55,16 @@ struct Sections {
             return true;
         return previous < next;
     }
+    static const char* name(Section section)
+    {
+        switch (section) {
+#define STRINGIFY_SECTION_NAME(NAME, ID, DESCRIPTION) case NAME: return #NAME;
+        FOR_EACH_WASM_SECTION(STRINGIFY_SECTION_NAME)
+#undef STRINGIFY_SECTION_NAME
+        default:
+            RELEASE_ASSERT_UNREACHABLE();
+            return "?";
+        }
 };
 
 } } // namespace JSC::Wasm
